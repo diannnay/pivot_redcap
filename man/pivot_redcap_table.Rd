@@ -51,7 +51,7 @@ Examples of valid variable names:
 }
 \examples{
 \dontrun{
-pivoted_df <- pivot_redcap_table(mmc_df_filt, families_100mmc)
+pivoted_df <- pivot_redcap_table(sample_2_df.csv, families_100mmc)
 }
 
 }

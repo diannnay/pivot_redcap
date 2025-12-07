@@ -29,12 +29,13 @@
 #'
 #' @examples
 #' \dontrun{
-#' pivoted_df <- pivot_redcap_table(mmc_df_filt, families_100mmc)
+#' pivoted_df <- pivot_redcap_table(sample_2_df.csv, families_100mmc)
 #' }
 #'
 #' @export 
 pivot_redcap_table<- function(df, families, constant_cols = c( "record_id", "redcap_event_name") , indx_slot =1, verbose =TRUE ) {  
-# Detect column families -------------------
+
+  # Detect column families -------------------
 column_family_map<- list()
   for (i in seq_along(families) ) {
     family_name <- families[[i]]
