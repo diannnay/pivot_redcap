@@ -10,7 +10,7 @@
 #' @param families A character vector of family prefixes to pivot.
 #' @param constant_cols A character vector of columns to keep unchanged (default: c("record_id", "redcap_event_name")).
 #' @param indx_slot Integer specifying which capture from the regex to use for the index (default: 1).
-#' @param verbose Logical; if TRUE, prints messages about data type harmonization and pivoting progress (default: TRUE).
+#' @param verbose Logical; if TRUE, prints messages about data type harmonization and pivoting progress (default: FALSE).
 #'
 #' @return A data.frame where all specified families are pivoted and merged, with consistent types and slot indices extracted.
 #'
@@ -33,7 +33,7 @@
 #' }
 #'
 #' @export 
-pivot_redcap_table<- function(df, families, constant_cols = c( "record_id", "redcap_event_name") , indx_slot =1, verbose =TRUE ) {  
+pivot_redcap_table<- function(df, families, constant_cols = c( "record_id", "redcap_event_name") , indx_slot =1, verbose =FALSE ) {  
 
   # Detect column families -------------------
 column_family_map<- list()

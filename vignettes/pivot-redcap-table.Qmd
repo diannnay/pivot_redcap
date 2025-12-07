@@ -1,0 +1,125 @@
+---
+title: "Demonstration of pivot_redcap_table function"
+author: "Diana Rinker"
+format: html
+editor: visual
+execute:
+  echo: true
+  warning: true
+  message: true
+---
+
+# Load required packages
+
+```{r}
+library(hw2.repo.dianarinker)
+library(tidyverse)
+# devtools::load_all() 
+```
+
+# Load sample data from package
+
+```{r}
+data("sample2")
+```
+
+# Overview
+
+This document demonstrates the use of the pivot_redcap_table() function on a sample REDCap-style data set. Below is an example of a table, as it looks for a data entry user in REDCap.
+
+```{r , message=TRUE, warning=TRUE, echo=TRUE}
+knitr::include_graphics(here::here("vignettes", "redcap_screenshot.jpg"))
+
+```
+
+Such format allows user-friendly data entr and easy quality control. However, the data is stored as a string on variables that requires manipulation prior to analysis. Current function simplifies and standardizes data processing.
+
+# Variables description.
+
+Variables that are used in this REDCap table must be named according to this function's convention, in order to be properly processed.
+
+The data set sample2 contains multiple REDCap-style variable families, each sharing:
+
+1.  Family prefix (base question variable name)
+
+2.  Index slot – first number following prefix.
+
+3.  Answer option – second number in name (optional)
+
+4.  Checkbox code – ignored for now
+
+The goal of is to pivot and harmonize all families into a tidy format.
+
+### Step 1. Define list of variable families (variable prefix) in REDCap:
+
+```{r , message=TRUE, warning=TRUE, echo=TRUE}
+families_sample<- c("learner_type"
+                    ,"grad_year"
+                    , "num"
+                    , "hours"
+                    , "content"
+                    , "eval_type"
+                    )
+families_sample
+```
+
+### Step 2. Define constant columns
+
+These columns depend on the settings of the redcap project and its data structure. Questions to consider:
+
+-   Are there multiple events?
+
+-   Are there repeating instances?
+
+-   Is there any other grouping variable, that makes your redcap table repeat in the raw data?
+
+The sample data used here has only two constant variables: record_id and redcap_event_name. Together they define unique combination of each instance of redcap table:
+
+```{r, message=TRUE, warning=TRUE, echo=TRUE}
+# head(sample2, n = 5)
+str(sample2)
+```
+
+```{r , message=TRUE, warning=TRUE, echo=TRUE}
+constant_cols_mmc <- c( "record_id"
+                        , "redcap_event_name"
+                        ) 
+constant_cols_mmc
+```
+
+### Step 3. Progress messages
+
+Set verbose = TRUE when testing and want to see progress messages or need to dig into data types of your variables. DEfault is False
+
+### Index
+Index column indicates the row of the pseudo-table in redcap. It can be used for further data transformations, or removed.
+
+
+
+# Usage
+```{r , message=TRUE, warning=TRUE, echo=TRUE}
+result <- pivot_redcap_table(sample2
+                             ,families_sample
+                             , verbose = FALSE  #default 
+                             )
+
+```
+
+### Field types
+
+REDCap fields type of text, drop-down or singe choice represented by one column and their value contains  text, code or label of the answer option. In these example it is: "learner_type","grad_year", "num", "hours", "content".
+
+"Eval_type" field is a pseudo multiple choice question in redcap, that is being transformed to a simple and easy for manimulation format. Each output column corresponds with one answer option checkbox.
+
+```{r , message=TRUE, warning=TRUE, echo=TRUE}
+result
+```
+
+# Summmary
+Resulting tibble contains only 16 variables instead of original 150. Each row corresponds with one combination of constant variables and the index slot.
+
+This function can be used as a part of:
+
+1.  Data cleaning prior to analysis or reporting
+
+2.   Data pipeline with APIs between different REDCap projects

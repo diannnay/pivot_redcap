@@ -9,7 +9,7 @@ pivot_redcap_table(
   families,
   constant_cols = c("record_id", "redcap_event_name"),
   indx_slot = 1,
-  verbose = TRUE
+  verbose = FALSE
 )
 }
 \arguments{
@@ -21,7 +21,7 @@ pivot_redcap_table(
 
 \item{indx_slot}{Integer specifying which capture from the regex to use for the index (default: 1).}
 
-\item{verbose}{Logical; if TRUE, prints messages about data type harmonization and pivoting progress (default: TRUE).}
+\item{verbose}{Logical; if TRUE, prints messages about data type harmonization and pivoting progress (default: FALSE).}
 }
 \value{
 A data.frame where all specified families are pivoted and merged, with consistent types and slot indices extracted.
