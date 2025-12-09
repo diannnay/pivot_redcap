@@ -35,7 +35,6 @@ knitr::include_graphics(here::here("vignettes", "redcap_screenshot.jpg"))
 Such format allows user-friendly data entr and easy quality control. However, the data is stored as a string on variables that requires manipulation prior to analysis. Current function simplifies and standardizes data processing.
 
 # Variables description.
-
 Variables that are used in this REDCap table must be named according to this function's convention, in order to be properly processed.
 
 The data set sample2 contains multiple REDCap-style variable families, each sharing:
