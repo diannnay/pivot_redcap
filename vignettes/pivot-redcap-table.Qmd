@@ -12,9 +12,9 @@ execute:
 # Load required packages
 
 ```{r}
-library(hw2.repo.dianarinker)
 library(tidyverse)
-# devtools::load_all() 
+library(dplyr)
+devtools::load_all()
 ```
 
 # Load sample data from package
@@ -35,6 +35,7 @@ knitr::include_graphics(here::here("vignettes", "redcap_screenshot.jpg"))
 Such format allows user-friendly data entr and easy quality control. However, the data is stored as a string on variables that requires manipulation prior to analysis. Current function simplifies and standardizes data processing.
 
 # Variables description.
+
 Variables that are used in this REDCap table must be named according to this function's convention, in order to be properly processed.
 
 The data set sample2 contains multiple REDCap-style variable families, each sharing:
@@ -91,11 +92,11 @@ constant_cols_mmc
 Set verbose = TRUE when testing and want to see progress messages or need to dig into data types of your variables. DEfault is False
 
 ### Index
+
 Index column indicates the row of the pseudo-table in redcap. It can be used for further data transformations, or removed.
 
-
-
 # Usage
+
 ```{r , message=TRUE, warning=TRUE, echo=TRUE}
 result <- pivot_redcap_table(sample2
                              ,families_sample
@@ -106,7 +107,7 @@ result <- pivot_redcap_table(sample2
 
 ### Field types
 
-REDCap fields type of text, drop-down or singe choice represented by one column and their value contains  text, code or label of the answer option. In these example it is: "learner_type","grad_year", "num", "hours", "content".
+REDCap fields type of text, drop-down or singe choice represented by one column and their value contains text, code or label of the answer option. In these example it is: "learner_type","grad_year", "num", "hours", "content".
 
 "Eval_type" field is a pseudo multiple choice question in redcap, that is being transformed to a simple and easy for manimulation format. Each output column corresponds with one answer option checkbox.
 
@@ -115,10 +116,11 @@ result
 ```
 
 # Summmary
+
 Resulting tibble contains only 16 variables instead of original 150. Each row corresponds with one combination of constant variables and the index slot.
 
 This function can be used as a part of:
 
 1.  Data cleaning prior to analysis or reporting
 
-2.   Data pipeline with APIs between different REDCap projects
+2.  Data pipeline with APIs between different REDCap projects
