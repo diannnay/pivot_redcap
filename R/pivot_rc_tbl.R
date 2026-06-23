@@ -9,7 +9,6 @@
 #' @param df A data.frame containing the REDCap data.
 #' @param families A character vector of family prefixes to pivot.
 #' @param constant_cols A character vector of columns to keep unchanged (default: c("record_id", "redcap_event_name")).
-#' @param indx_slot Integer specifying which capture from the regex to use for the index (default: 1).
 #' @param verbose Logical; if TRUE, prints messages about data type harmonization and pivoting progress (default: FALSE).
 #'
 #' @return A data.frame where all specified families are pivoted and merged, with consistent types and slot indices extracted.
@@ -33,7 +32,7 @@
 #' }
 #'
 #' @export
-pivot_redcap_table<- function(df, families, constant_cols = c( "record_id", "redcap_event_name") , indx_slot =1, verbose =FALSE ) {
+pivot_redcap_table<- function(df, families, constant_cols = c( "record_id", "redcap_event_name") , verbose =FALSE ) {
 
   # Detect column families -------------------
 column_family_map<- list()
@@ -58,7 +57,7 @@ column_family_map <- column_family_map[sapply(column_family_map, length) > 0]
 
 # --- Index handling -----------------------------------------------------
 # gather all slot indices present in any family
-indx_slot <- 1
+indx_slot <- 1  # always capture group 1; REDCap variables must follow family_prefix + numeric suffix convention
 index_pattern <- function (family_prefix) {paste0(
   "^", family_prefix, # E.g., ^eval_type
   "_?", # Make the underscore immediately following the prefix OPTIONAL
@@ -105,10 +104,13 @@ for (family_key in names(column_family_map)) {
 
   if (verbose) message("Family '", family_key,
                        "': first column with data = ", first_with_data,
-                       " → target = ", target)
+                       " -> target = ", target)
   # convert all columns to the target type
   for (col in fam_cols) {
     before <- class(df[[col]])[1]
+    if (haven::is.labelled(df[[col]])) {
+      df[[col]] <- haven::zap_labels(df[[col]])
+    }
 
     if (target == "factor") {
       df[[col]] <- as.factor(df[[col]])
@@ -118,7 +120,7 @@ for (family_key in names(column_family_map)) {
       df[[col]] <- suppressWarnings(as.numeric(as.character(df[[col]])))
     }
     after <- class(df[[col]])[1]
-    if (verbose) message("  - ", col, ": ", before, " → ", after)
+    if (verbose) message("  - ", col, ": ", before, " -> ", after)
   }
 }
 # --- PIVOTING  FAMILIES--------------------------------
@@ -129,37 +131,37 @@ pivoted_families_list <- list()
     family_colnames<-column_family_map[[i]]
     family_prefix  <-family_name
 
-    pivoted_family_df <-df %>%
-      dplyr::select(constant_cols, all_of(family_colnames) ) %>%
+    pivoted_family_df <-df|>
+      dplyr::select(constant_cols, all_of(family_colnames) )|>
       tidyr::pivot_longer(
         cols = dplyr::all_of(family_colnames),
         names_to = "col_name",
-        values_to = "value"    ) %>% #  This will be either 1/0 var for multiple choices, text or NA for text or drop down fields,
+        values_to = "value"    )|> #  This will be either 1/0 var for multiple choices, text or NA for text or drop down fields,
 # extract index:
-      dplyr::mutate(index = extract_idx_scalar(col_name, .env$family_prefix)) %>%
+      dplyr::mutate(index = extract_idx_scalar(col_name, .env$family_prefix))|>
       dplyr::select(constant_cols,index, col_name, value)
 # standardize dfs for merging:
-    group_df<-pivoted_family_df %>%
-      group_by (across(constant_cols), index  ) %>%
-      summarize (count= n(), .groups = "drop")
+    group_df<-pivoted_family_df|>
+      dplyr::group_by (  dplyr::across(constant_cols), index  )|>
+      dplyr::summarise (count=   dplyr::n(), .groups = "drop")
     if( max(group_df$count)==1) { #  indicates that there is only one answer option per slot_index
-      pivoted_family_df <- pivoted_family_df %>%
-        mutate(col_name = sub("(\\D+).*", "\\1", col_name))%>%
+      pivoted_family_df <- pivoted_family_df|>
+        dplyr::mutate(col_name = sub("(\\D+).*", "\\1", col_name))%>%
         tidyr::pivot_wider(names_from = col_name,values_from = value)
-      print ( paste0("Family '", family_prefix, "' is pivoted"))
+      message ( paste0("Family '", family_prefix, "' is pivoted"))
         }
     if( max(group_df$count)>1) { #  indicates that there are multiple variables for a slot_index => multiple choice question
-      pivoted_family_df <- pivoted_family_df %>%
-        mutate(col_name = paste0( .env$family_prefix, "_", extract_answer_index(col_name, .env$family_prefix))) %>%
-         group_by (across(constant_cols), index  ) %>%
-         pivot_wider(names_from = col_name, values_from = value )
-      print ( paste0("Family '", family_prefix, "' is pivoted"))
+      pivoted_family_df <- pivoted_family_df|>
+        dplyr::mutate(col_name = paste0( .env$family_prefix, "_", extract_answer_index(col_name, .env$family_prefix)))|>
+        dplyr::group_by (dplyr::across(constant_cols), index  )|>
+        tidyr::pivot_wider(names_from = col_name, values_from = value )
+      message ( paste0("Family '", family_prefix, "' is pivoted"))
         }
     pivoted_families_list[[i]] <- pivoted_family_df
     }
-merged_families_df <- pivoted_families_list %>%
-  reduce(function(x, y) full_join(x, y, by = c(constant_cols, "index")))
-print ( paste0("Pivoted families'", family_prefix, "' were merged"))
+merged_families_df <- pivoted_families_list|>
+  purrr::reduce(function(x, y) dplyr::full_join(x, y, by = c(constant_cols, "index")))
+message ( paste0("Pivoted families'", family_prefix, "' were merged"))
 merged_families_df
    }
 

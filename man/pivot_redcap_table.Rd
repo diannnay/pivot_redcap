@@ -8,7 +8,6 @@ pivot_redcap_table(
   df,
   families,
   constant_cols = c("record_id", "redcap_event_name"),
-  indx_slot = 1,
   verbose = FALSE
 )
 }
@@ -18,8 +17,6 @@ pivot_redcap_table(
 \item{families}{A character vector of family prefixes to pivot.}
 
 \item{constant_cols}{A character vector of columns to keep unchanged (default: c("record_id", "redcap_event_name")).}
-
-\item{indx_slot}{Integer specifying which capture from the regex to use for the index (default: 1).}
 
 \item{verbose}{Logical; if TRUE, prints messages about data type harmonization and pivoting progress (default: FALSE).}
 }

@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(hw2.repo.dianarinker)
+library(PivotRedcapTable)
 
-test_check("hw2.repo.dianarinker")
+test_check("PivotRedcapTable")

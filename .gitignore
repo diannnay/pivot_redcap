@@ -2,6 +2,9 @@
 .Rhistory
 .Ruserdata
 .Rproj
-starter_hw2_code.R
-.csv
-
+*.csv
+*.positai
+*.xlsx
+*.rda
+data/
+data-raw/

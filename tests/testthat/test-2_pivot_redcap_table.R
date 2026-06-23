@@ -1,12 +1,12 @@
 library(testthat)
-library(hw2.repo.dianarinker)  
+library(PivotRedcapTable)
 # tests/testthat/test_pivot_redcap_table_warning.R
 test_that("pivot_redcap_table warns when a non-existent family is provided", {
-  data("sample1", package = "hw2.repo.dianarinker")
-  
+  data("sample1", package = "PivotRedcapTable")
+
   # Include a family that does NOT exist
   families<- c("first_name","last_name", "email", "role", "nonexistent_family")
-  
+
   # Expect a warning about missing family columns
   expect_warning(
     pivot_redcap_table(  sample1
@@ -15,3 +15,6 @@ test_that("pivot_redcap_table warns when a non-existent family is provided", {
     regexp = "Family 'nonexistent_family' has no columns"
   )
 })
+
+
+
