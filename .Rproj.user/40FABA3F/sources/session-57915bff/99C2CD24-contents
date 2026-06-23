@@ -1,0 +1,27 @@
+Package: PivotRedcapTable
+Title: Transform REDCap Pseudo-Tables into Analyzable Format
+Version: 0.1.0
+Authors@R: 
+    person("Diana", "Rinker", , "dianarinker@gmail.com", role = c("aut", "cre"))
+Description: Reshapes REDCap checkbox and repeating instrument exports from wide 
+    pseudo-table format into tidy long-format data frames ready for analysis. 
+    Designed for clinical research workflows using REDCap at academic medical centers.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Depends: 
+    R (>= 3.5)
+Imports:
+    dplyr,
+    tidyr,
+    purrr,
+    stringr,
+    haven
+Suggests: 
+    knitr,
+    rmarkdown,
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+LazyData: true
+VignetteBuilder: knitr

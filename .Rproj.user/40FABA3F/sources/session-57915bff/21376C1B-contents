@@ -1,0 +1,38 @@
+#' Select a canonical metadata field by prefix
+#'
+#' Given a field name prefix, identify the first matching metadata field
+#' that defines selectable choices (e.g., radio or checkbox fields).
+#' When multiple fields match, the field with the smallest numeric suffix
+#' is preferred (e.g., `learner_type1` over `learner_type10`). If no numeric
+#' suffixes are present, the first matching field is returned.
+#'
+#' This helper is useful for normalizing REDCap-style repeated fields and
+#' selecting a representative variable from a family of similarly named
+#' fields.
+#'
+#' @param prefix Character string. Prefix used to match the beginning of
+#'   metadata field names.
+#' @param md Data frame containing REDCap-style metadata. Must include
+#'   `field_name` and `select_choices_or_calculations` columns.
+#'
+#' @return A single character string giving the selected metadata field name.
+#'
+#' @examples
+#' md <- data.frame(
+#'   field_name = c("learner_type1", "learner_type2", "learner_type10"),
+#'   select_choices_or_calculations = c("1, A | 2, B", "1, A | 2, B", "1, A | 2, B")
+#' )
+#'
+#' meta_first("learner_type", md)
+#'
+#' @export
+
+meta_first <- function(prefix, md = meta_data) {
+  rows <- md[ grepl(paste0("^", prefix), md$field_name) &
+                !is.na(md$select_choices_or_calculations) &
+                md$select_choices_or_calculations != "", ]
+  if (nrow(rows) == 0) stop("No metadata with choices for prefix: ", prefix)
+  # Prefer the smallest numeric suffix (e.g., learner_type1 over learner_type10)
+  ord <- suppressWarnings(as.integer(sub(".*?(\\d+)$", "\\1", rows$field_name)))
+  rows$field_name[ if (all(is.na(ord))) 1L else which.min(ord) ]
+}

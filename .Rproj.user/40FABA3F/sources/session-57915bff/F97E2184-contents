@@ -1,0 +1,11 @@
+.Rproj.user
+.Rhistory
+.Ruserdata
+.Rproj
+*.csv
+*.positai
+*.xlsx
+*.rda
+data/
+data-raw/
+README.html
